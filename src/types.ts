@@ -1,4 +1,9 @@
-/// <reference types="vite/client" />
-/// <reference types="vite-plugin-svgr/client" />
+export type Thought = {
+  title: string;
+  image: string;
+  created: string;
+  markdown: string;
+  location: string;
+};
 
 export type Children = React.ReactNode | React.ReactNode[];

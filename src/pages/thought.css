@@ -1,0 +1,40 @@
+:root {
+  --markdown-highlight: #55eeff;
+}
+
+mark {
+  background-color: var(--markdown-highlight);
+}
+
+.markdown-body {
+  font-size: 18px;
+  line-height: 1.8;
+  overflow-wrap: break-word;
+}
+
+.octo {
+  opacity: 0;
+  position: absolute;
+  margin-left: -28px;
+  padding: 8px;
+}
+
+.octo:focus {
+  opacity: 1;
+}
+
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+tbody tr:nth-last-child(1) {
+  border-bottom: none;
+}
+
+@media (hover: hover) {
+  .octo-wrapper:hover > .octo {
+    opacity: 1;
+  }
+}

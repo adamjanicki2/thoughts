@@ -2,6 +2,14 @@ body {
   overflow-x: hidden;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body * {
+  scroll-margin-top: 64px;
+}
+
 p {
   line-height: 1.5;
 }
