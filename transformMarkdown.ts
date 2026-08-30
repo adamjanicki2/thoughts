@@ -50,5 +50,21 @@ export function transformMarkdown(): Plugin {
         return `export const thoughts = ${JSON.stringify(loadThoughts())};`;
       }
     },
+
+    handleHotUpdate({ file, server }) {
+      if (file.startsWith(ENTRIES_DIR)) {
+        const module = server.moduleGraph.getModuleById(
+          RESOLVED_VIRTUAL_MODULE_ID
+        );
+
+        if (module) {
+          server.moduleGraph.invalidateModule(module);
+        }
+
+        server.ws.send({
+          type: "full-reload",
+        });
+      }
+    },
   };
 }
