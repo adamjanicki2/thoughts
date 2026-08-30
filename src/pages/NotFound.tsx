@@ -13,6 +13,7 @@ export default function NotFound() {
           textAlign: "center",
         }}
       >
+        <ui.h1>404</ui.h1>
         Oops! The requested page does not exist.
         <ui.br />
         Try going <Link to="/">home</Link>.

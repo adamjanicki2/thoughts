@@ -1,12 +1,15 @@
 {
-  "name": "react-skeleton",
-  "homepage": "https://adamjanicki.xyz/react-skeleton",
+  "name": "thoughts",
+  "homepage": "https://adamjanicki.xyz/thoughts",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@adamjanicki/ui": "latest",
+    "@adamjanicki/markdown": "^1.0.0",
+    "@adamjanicki/ui": "^1.9.5",
+    "gray-matter": "^4.0.3",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "react-syntax-highlighter": "^16.1.1"
   },
   "scripts": {
     "start": "vite",
@@ -17,7 +20,9 @@
     "deploy": "gh-pages -d build"
   },
   "devDependencies": {
+    "@types/node": "^26.4.0",
     "@types/react-dom": "^19.2.3",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@vitejs/plugin-react": "^5.1.2",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",

@@ -2,12 +2,21 @@ body {
   overflow-x: hidden;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body * {
+  scroll-margin-top: 64px;
+}
+
 p {
   line-height: 1.5;
 }
 
-.page-title-text {
-  font-size: calc(28px + 1vw);
+.no-bg * {
+  background-color: transparent !important;
+  background: none;
 }
 
 .bordering {
