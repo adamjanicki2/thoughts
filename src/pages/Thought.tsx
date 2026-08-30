@@ -2,7 +2,9 @@ import "src/pages/thought.css";
 
 import Markdown from "@adamjanicki/markdown";
 import {
+  Badge,
   Box,
+  Button,
   classNames,
   Icon,
   Link,
@@ -10,9 +12,17 @@ import {
   useScrollToHash,
 } from "@adamjanicki/ui";
 import transformVfx from "@adamjanicki/ui/components/ui/transformVfx";
-import { chevronLeft, chevronRight, link } from "@adamjanicki/ui/icons";
+import {
+  check,
+  chevronLeft,
+  chevronRight,
+  clipboard,
+  link,
+} from "@adamjanicki/ui/icons";
 import { Vfx } from "@adamjanicki/ui/types/common";
-import React from "react";
+import React, { useRef, useState } from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneLight as light } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Page from "src/components/Page";
 import type { Children, Thought as ThoughtStruct } from "src/types";
 import { formatDate, idify } from "src/util";
@@ -45,7 +55,7 @@ export default function Thought({ thought, previous, next }: Props) {
   });
 
   return (
-    <Page title={title} vfx={{ paddingX: "l" }}>
+    <Page title={title}>
       <Box
         vfx={{ axis: "y", align: "center", gap: "s" }}
         className="thought-container"
@@ -66,6 +76,11 @@ export default function Thought({ thought, previous, next }: Props) {
           Published {formatDate(created)} in {location}
         </ui.span>
         <Markdown
+          hideTags={{
+            h4: "unwrap",
+            h5: "unwrap",
+            h6: "unwrap",
+          }}
           className={classNames(
             "markdown-body",
             transformVfx({
@@ -73,7 +88,11 @@ export default function Thought({ thought, previous, next }: Props) {
             })
           )}
           renderers={{
-            a: ({ children, href }) => <Link to={href}>{children}</Link>,
+            a: ({ children, href }) => (
+              <Link newTab={isExternal(href)} to={href}>
+                {children}
+              </Link>
+            ),
             blockquote: ({ children }) => (
               <ui.blockquote
                 vfx={{
@@ -87,11 +106,22 @@ export default function Thought({ thought, previous, next }: Props) {
                 {...{ children }}
               />
             ),
+            code: ({ children }) => (
+              <ui.code
+                children={children}
+                style={{
+                  color: "darkred",
+                  overflowWrap: "break-word",
+                  wordBreak: "break-word",
+                }}
+              />
+            ),
+            pre: ({ children, lang }) => <CustomPre {...{ children, lang }} />,
             h1: ({ children }) => (
               <IdElementWrapper
                 idToStringify={children}
                 type="h1"
-                vfx={{ fontSize: "l", margin: "none" }}
+                vfx={{ fontSize: "xl", margin: "none" }}
               >
                 {children}
               </IdElementWrapper>
@@ -100,6 +130,15 @@ export default function Thought({ thought, previous, next }: Props) {
               <IdElementWrapper
                 idToStringify={children}
                 type="h2"
+                vfx={{ fontSize: "l", margin: "none" }}
+              >
+                {children}
+              </IdElementWrapper>
+            ),
+            h3: ({ children }) => (
+              <IdElementWrapper
+                idToStringify={children}
+                type="h3"
                 vfx={{ fontSize: "m", margin: "none" }}
               >
                 {children}
@@ -146,6 +185,15 @@ export default function Thought({ thought, previous, next }: Props) {
                 </IdElementWrapper>
               );
             },
+            hr: () => (
+              <ui.hr
+                style={{
+                  height: "3px",
+                  border: "none",
+                  backgroundColor: "#ccc",
+                }}
+              />
+            ),
             table: ({ children }) => (
               <IdElementWrapper idToStringify={children}>
                 <ui.span
@@ -154,7 +202,6 @@ export default function Thought({ thought, previous, next }: Props) {
                     width: "full",
                     radius: "rounded",
                     border: true,
-                    backgroundColor: "default",
                     overflowX: "auto",
                     lineHeight: "s",
                     shadow: "subtle",
@@ -266,7 +313,7 @@ type IdElementWrapperProps = {
   idToStringify: React.ReactNode;
   className?: string;
   vfx?: Vfx;
-  type?: "h1" | "h2" | "span";
+  type?: "h1" | "h2" | "h3" | "span";
 };
 
 function IdElementWrapper({
@@ -293,5 +340,94 @@ function IdElementWrapper({
       <Octothorpe id={id} />
       {children}
     </Component>
+  );
+}
+
+function isExternal(href: string) {
+  return !(href.startsWith("#") || href.startsWith("/"));
+}
+
+type PreProps = {
+  children: React.ReactNode;
+  lang?: string;
+};
+
+function CustomPre({ children, lang }: PreProps) {
+  const [copied, setCopied] = useState(false);
+  const timeOutRef = useRef<number>(null);
+  const code = stringifyChildren(children).trim();
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    if (timeOutRef.current) clearTimeout(timeOutRef.current);
+    timeOutRef.current = setTimeout(() => setCopied(false), 3000) as any;
+  };
+
+  return (
+    <Box
+      vfx={{
+        width: "full",
+        radius: "rounded",
+        marginY: "m",
+        border: true,
+        backgroundColor: "default",
+        shadow: "floating",
+      }}
+    >
+      <Box
+        vfx={{
+          axis: "x",
+          align: "center",
+          justify: "between",
+          borderBottom: true,
+          paddingX: "s",
+          paddingY: "xs",
+        }}
+      >
+        <ui.span vfx={{ fontSize: "s", fontWeight: 5 }}>
+          {lang || "unknown"}
+        </ui.span>
+        {copied ? (
+          <Badge vfx={{ axis: "x", align: "center", gap: "xs" }} type="success">
+            <Icon icon={check} /> Copied
+          </Badge>
+        ) : (
+          <Button
+            vfx={{ axis: "x", align: "center", gap: "xs", paddingY: "xxs" }}
+            onClick={copyCode}
+            size="small"
+            variant="secondary"
+          >
+            <Icon icon={clipboard} />
+            Copy
+          </Button>
+        )}
+      </Box>
+      <ui.pre
+        vfx={{
+          axis: "x",
+          margin: "none",
+          overflow: "auto",
+          padding: "s",
+          width: "full",
+        }}
+        style={{ maxHeight: "70vh" }}
+      >
+        <SyntaxHighlighter
+          style={light}
+          language={lang || "text"}
+          customStyle={{
+            background: "none",
+            backgroundColor: "transparent",
+            padding: 0,
+            margin: 0,
+          }}
+          className="no-bg"
+        >
+          {code}
+        </SyntaxHighlighter>
+      </ui.pre>
+    </Box>
   );
 }
